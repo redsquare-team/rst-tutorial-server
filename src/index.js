@@ -8,24 +8,35 @@ app.use(bodyParser.json())
 
 app.use(cors());
 
-var messages=[];
+var db = require("./db.js");
+
+var messages = [];
 
 app.post("/guestbook/send-message", function (req, res) {
     var msg = req.body;
 
     // instantiate a new date object with current time
-    msg.time= new Date();
+    msg.time = new Date();
+
+    db.chatModel.create(msg);
 
     messages.push(msg);
 
     res.send(JSON.stringify(messages));
 });
 
-app.get("/guestbook/read-messages", function(req, res) {
+app.get("/guestbook/read-messages", function (req, res) {
     res.send(JSON.stringify(messages));
 });
 
-
-app.listen(60000, function () {
-    console.log("Ready to listen...");
+db.sequelize.sync().then(function() {
+    return db.chatModel.findAll().then(data => {
+        console.log(data);
+        return messages = data;
+    })
+})
+.then(function () {
+    app.listen(60000, function () {
+        console.log("Ready to listen...");
+    })
 })
