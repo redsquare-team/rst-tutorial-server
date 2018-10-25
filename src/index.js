@@ -31,7 +31,6 @@ app.get("/guestbook/read-messages", function (req, res) {
 
 db.sequelize.sync().then(function() {
     return db.chatModel.findAll().then(data => {
-        console.log(data);
         return messages = data;
     })
 })
